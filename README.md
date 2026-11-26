@@ -55,7 +55,7 @@ Exact diagonalization. The parity P = product of Z_i commutes with H. For every 
 
 Free fermions. The Jordan-Wigner map turns the chain into Majorana fermions, and H becomes quadratic. I build the real antisymmetric matrix A, and the ground state covariance matrix is Gamma = -A (-A A)^(-1/2). The entropy of the first l sites comes from the eigenvalues of i Gamma restricted to those sites (Peschel, and Vidal and others). Only blocks that start at site 0 are used, because only for them the Majorana reduced state equals the spin reduced state. The chain is symmetric under reflection and the ground state is unique, so S(l) = S(L - l). I compute only l up to L/2 where I need a profile.
 
-I use the free fermion code only for open chains with h >= 1. For h < 1 the open chain has a nearly zero edge mode. Its energy drops below double precision at large L, and the code raises an error there.
+I use the free fermion code only for open chains with h >= 1. For h < 1 the open chain has an edge mode whose energy falls roughly exponentially with L. The code raises an error when the smallest mode energy is below 1e-6. That limit sits well above the rounding floor of about 1e-8, so the check does not depend on rounding. For example, it raises at h = 0.5 with L = 1024 and at h = 0.9 with L = 256. At h = 1 the smallest mode energy is still about 1.5e-3 at L = 2048.
 
 Checking one method against the other. For open chains with L = 8, 12, 16, 20 and h = 1.0, 1.5, 2.0, the largest difference in entropy over all l is 7.9e-13 and the largest difference in ground state energy is 5.0e-14.
 
@@ -91,14 +91,14 @@ The pre-registered test passed. The main estimate is consistent with 1/2, becaus
 
 ## What I checked
 
-The test suite has 98 tests, and they all pass. They cover:
+The test suite has 101 tests, and they all pass. They cover:
 
 - The sparse Hamiltonian against a full Hamiltonian built from Kronecker products of Pauli matrices, for L = 2, 3, 4, both boundaries.
 - The periodic ground state energy against the exact formula, for L up to 12.
 - The even sector being the lowest in energy.
 - The h = 0 cat state with entropy ln 2, and the large field product state.
 - The free fermion energy and entropy profile against exact diagonalization for open chains up to L = 12.
-- The covariance matrix properties, the single site case and the near zero mode error.
+- The covariance matrix properties, the single site case, and the near zero mode error at large L for h < 1 (and no error at h = 1).
 - The entropy of product, Bell and random states, the bit order, and the reflection symmetry of ground state entropy.
 - The fits of c on synthetic data.
 

@@ -32,7 +32,8 @@ def ground_state_covariance(A):
     M = -A @ A
     w, W = np.linalg.eigh(M)
     w = np.clip(w, 0.0, None)
-    if np.sqrt(w.min()) < 1e-8:
+    # The rounding floor of sqrt(w.min()) is about 1e-8, so 1e-6 never depends on rounding.
+    if np.sqrt(w.min()) < 1e-6:
         raise ValueError("near zero mode, free fermion ground state is not well defined here")
     inv_sqrt = (W / np.sqrt(w)) @ W.T
     Gamma = -A @ inv_sqrt

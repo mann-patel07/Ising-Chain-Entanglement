@@ -31,3 +31,14 @@ def test_single_site():
 def test_near_zero_mode():
     with pytest.raises(ValueError):
         ground_state_covariance(majorana_matrix(100, 0.5))
+
+
+@pytest.mark.parametrize("L,h", [(1024, 0.5), (256, 0.9)])
+def test_near_zero_mode_raises_at_large_L(L, h):
+    with pytest.raises(ValueError):
+        ground_state_covariance(majorana_matrix(L, h))
+
+
+def test_critical_chain_does_not_raise():
+    Gamma, E0 = ground_state_covariance(majorana_matrix(512, 1.0))
+    assert np.isfinite(E0)

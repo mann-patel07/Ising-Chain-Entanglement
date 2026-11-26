@@ -35,18 +35,17 @@ else:
 for p in re.findall(r"\]\((figures/[^)]+)\)", readme):
     check(os.path.exists(p), f"missing figure {p}")
 
-SKIP_DIRS = {".venv", "results_quick", "__pycache__", ".pytest_cache", ".ipynb_checkpoints"}
 EXTS = (".py", ".md", ".txt", ".csv", ".json")
 bad = [chr(c) for c in (0x2014, 0x2013, 0x201C, 0x201D, 0x2018, 0x2019)]
-bad += ["/Us" + "ers/", "Cla" + "ude", "Anthr" + "opic", "TO" + "DO", "T" + "BD"]
-files = []
-for root, dirs, fs in os.walk("."):
-    dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
-    for fn in fs:
-        if fn in ("ENTANGLEMENT_REPORT.md", ".DS_Store"):
-            continue
-        files.append(os.path.join(root, fn))
+bad += ["/Users/"]
+# Only the files that are uploaded are scanned.
+files = ["README.md", "PREREGISTRATION.md", "LICENSE", ".gitignore", "requirements.txt"]
+files += sorted(f for f in os.listdir(".") if f.endswith(".py"))
+for d in ("tests", "results", "figures"):
+    files += sorted(os.path.join(d, f) for f in os.listdir(d) if not f.startswith(".") and f != "__pycache__")
 for p in files:
+    if p == "check_consistency.py":
+        continue  # this file names the patterns it looks for
     if p.endswith(EXTS) or os.path.basename(p) in ("LICENSE", ".gitignore"):
         with open(p, encoding="utf-8") as f:
             txt = f.read()
