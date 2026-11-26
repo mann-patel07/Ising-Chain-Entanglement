@@ -71,6 +71,8 @@ Checking one method against the other. For open chains with L = 8, 12, 16, 20 an
 
 The systematic is the absolute difference between the last two doublings of the main estimate. It is 0.0007.
 
+The free fermion estimates move halfway closer to 0.5 with each doubling, so the error falls like 1/L. A Richardson extrapolation of the last two doublings, 2 x 0.5007 - 0.5013 with the unrounded values, gives 0.50000. This is a supporting estimate, not part of the plan in `PREREGISTRATION.md`.
+
 ![Entropy profiles](figures/fig1_entropy_profiles.png)
 
 Figure 1 shows the area law and the logarithm. At h = 0.5 and h = 2 the profile is flat in the middle. At h = 1 it keeps rising towards the middle of the chain.
