@@ -1,6 +1,6 @@
 # Entanglement in the quantum Ising chain
 
-I measure the central charge of the critical transverse field Ising chain from the entanglement entropy of its ground state. I use exact diagonalization up to 20 spins and an exact free fermion solution up to 2048 spins. The entropy of a block grows like the logarithm of the block size at the critical point, and the slope gives c. My main result is c = 0.5007, against the exact 1/2, with a finite size systematic of 0.0007.
+I measure the central charge of the critical transverse field Ising chain from the entanglement entropy of its ground state. I use exact diagonalization up to 20 spins and an exact free fermion solution up to 2048 spins. The entropy of a block grows like the logarithm of the block size at the critical point, and the slope gives c. My main result is c = 0.5007, against the exact 1/2, with a finite size systematic of 0.0007. Periodic chains of up to 2048 spins, added later, give c = 0.500000.
 
 ![Calabrese and Cardy fits at h = 1](figures/fig2_calabrese_cardy.png)
 
@@ -29,25 +29,20 @@ The 1D quantum Ising chain and the 2D classical Ising model are in the same univ
 
 ## How to run it
 
-I used Python 3.12.5.
+I used Python 3.12.5. Run each command from the project folder with the environment active (`source .venv/bin/activate`). The times were measured on my laptop with another job running.
 
-```
-python3.12 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+| Command | What it does | Time |
+| --- | --- | --- |
+| `python3.12 -m venv .venv` | makes the environment | 1.9 s |
+| `pip install -r requirements.txt` | installs the pinned packages | 11 s |
+| `python -m pytest -q` | runs the 121 tests | 15 s |
+| `python run_all.py --quick` | a small run, written to `results_quick/` | 30 s |
+| `python run_all.py` | the full run, written to `results/` | 135 s |
+| `python run_periodic_ff.py` | the periodic free fermion run (added after the first version) | 25 s |
+| `python make_figures.py` | makes the figures | 0.9 s |
+| `python check_consistency.py` | checks the numbers in this README | 0.1 s |
 
-Then, from the project folder with the environment active:
-
-```
-python -m pytest -q
-python run_all.py --quick
-python run_all.py
-python make_figures.py
-python check_consistency.py
-```
-
-The full run took about 124 seconds on my laptop. The quick run writes to `results_quick/` and takes under a minute. Everything runs offline. Nothing is downloaded and no account is needed.
+Everything runs offline. Nothing is downloaded and no account is needed.
 
 ## Method
 
@@ -55,9 +50,9 @@ Exact diagonalization. The parity P = product of Z_i commutes with H. For every 
 
 Free fermions. The Jordan-Wigner map turns the chain into Majorana fermions, and H becomes quadratic. I build the real antisymmetric matrix A, and the ground state covariance matrix is Gamma = -A (-A A)^(-1/2). The entropy of the first l sites comes from the eigenvalues of i Gamma restricted to those sites (Peschel, and Vidal and others). Only blocks that start at site 0 are used, because only for them the Majorana reduced state equals the spin reduced state. The chain is symmetric under reflection and the ground state is unique, so S(l) = S(L - l). I compute only l up to L/2 where I need a profile.
 
-I use the free fermion code only for open chains with h >= 1. For h < 1 the open chain has an edge mode whose energy falls roughly exponentially with L. The code raises an error when the smallest mode energy is below 1e-6. That limit sits well above the rounding floor of about 1e-8, so the check does not depend on rounding. For example, it raises at h = 0.5 with L = 1024 and at h = 0.9 with L = 256. At h = 1 the smallest mode energy is still about 1.5e-3 at L = 2048.
+I use the free fermion code for open chains with h >= 1 and, added later, for periodic chains in the even parity sector (see Results). For open chains with h < 1 the open chain has an edge mode whose energy falls roughly exponentially with L. The code raises an error when the smallest mode energy is below 1e-6. That limit sits well above the rounding floor of about 1e-8, so the check does not depend on rounding. For example, it raises at h = 0.5 with L = 1024 and at h = 0.9 with L = 256. At h = 1 the smallest mode energy is still about 1.5e-3 at L = 2048.
 
-Checking one method against the other. For open chains with L = 8, 12, 16, 20 and h = 1.0, 1.5, 2.0, the largest difference in entropy over all l is 7.9e-13 and the largest difference in ground state energy is 5.0e-14.
+Checking one method against the other. For open chains with L = 8, 12, 16, 20 and h = 1.0, 1.5, 2.0, the largest differences in entropy (over all l) and in ground state energy are both below 1e-11. Differences this small are rounding error, so their exact values change from one computer to another, and I only state the bound.
 
 ## Results
 
@@ -73,13 +68,30 @@ The systematic is the absolute difference between the last two doublings of the 
 
 The free fermion estimates move halfway closer to 0.5 with each doubling, so the error falls like 1/L. A Richardson extrapolation of the last two doublings, 2 x 0.5007 - 0.5013 with the unrounded values, gives 0.50000. This is a supporting estimate, not part of the plan in `PREREGISTRATION.md`.
 
+### Periodic chains with free fermions (added after the first version)
+
+I added this after the first version, and the plan is in `UPGRADE_PLAN.md`. In the even parity sector the periodic spin chain maps to Majorana fermions with an antiperiodic boundary: the bond between the last and the first site enters with the opposite sign. I checked this against exact diagonalization of periodic chains with L = 8, 12, 16, 20 and h = 1.0, 1.5, 2.0. The largest differences in entropy (over all l) and in ground state energy are both below 1e-11. The results are in `results/central_charge_periodic.json`.
+
+| Estimator | Sizes | c |
+| --- | --- | --- |
+| Two sizes, free fermion, periodic, h = 1 | L = 16 and 32 | 0.499391 |
+| Two sizes, free fermion, periodic, h = 1 | L = 32 and 64 | 0.499848 |
+| Two sizes, free fermion, periodic, h = 1 | L = 64 and 128 | 0.499962 |
+| Two sizes, free fermion, periodic, h = 1 | L = 128 and 256 | 0.499990 |
+| Two sizes, free fermion, periodic, h = 1 | L = 256 and 512 | 0.499998 |
+| Two sizes, free fermion, periodic, h = 1 | L = 512 and 1024 | 0.499999 |
+| Two sizes, free fermion, periodic, h = 1 | L = 1024 and 2048 | 0.500000 |
+| Fit of S(l), free fermion, periodic, h = 1 | L = 1024, l = 64 to 512 in steps of 16 | 0.500001 |
+
+The last doubling gives c = 0.500000. It differs from the previous doubling by less than 1e-6. For the same pair of sizes, L = 1024 and 2048, the open chain is 6.5e-04 away from 1/2 and the periodic chain is less than 1e-6 away. At this level the last digits depend on rounding, so they can differ slightly between computers. For L = 16 and 32 the open chain is 3.9e-02 away and the periodic chain is 6.1e-04 away. I have not checked why the periodic chain converges faster. The main estimate stays the open chain value, because that is the estimate fixed in `PREREGISTRATION.md`. The periodic result is a supporting estimate.
+
 ![Entropy profiles](figures/fig1_entropy_profiles.png)
 
 Figure 1 shows the area law and the logarithm. At h = 0.5 and h = 2 the profile is flat in the middle. At h = 1 it keeps rising towards the middle of the chain.
 
 ![c against 1/L2](figures/fig3_central_charge_vs_size.png)
 
-Figure 3 shows c from pairs of sizes against 1/L2. The open chain approaches 0.5 from above. The periodic chain approaches it from below.
+Figure 3 shows c from pairs of sizes against 1/L2. The open chain approaches 0.5 from above. The periodic chain from exact diagonalization approaches it from below. The periodic free fermion series, added later, is also below 0.5 at every size and is much closer to it.
 
 ![Half chain entropy against the field](figures/fig4_half_chain_vs_field.png)
 
@@ -93,7 +105,7 @@ The pre-registered test passed. The main estimate is consistent with 1/2, becaus
 
 ## What I checked
 
-The test suite has 101 tests, and they all pass. They cover:
+The test suite has 121 tests, and they all pass. They cover:
 
 - The sparse Hamiltonian against a full Hamiltonian built from Kronecker products of Pauli matrices, for L = 2, 3, 4, both boundaries.
 - The periodic ground state energy against the exact formula, for L up to 12.
@@ -103,10 +115,11 @@ The test suite has 101 tests, and they all pass. They cover:
 - The covariance matrix properties, the single site case, and the near zero mode error at large L for h < 1 (and no error at h = 1).
 - The entropy of product, Bell and random states, the bit order, and the reflection symmetry of ground state entropy.
 - The fits of c on synthetic data.
+- The periodic free fermion solution (added after the first version): energy and every block entropy against exact diagonalization for L = 4 to 12 and h = 0.5, 1, 2, the energy against the exact formula at L = 64, no near zero mode error at L = 1024 and h = 0.5, and the two size estimator on the committed open chain data.
 
 ## Limits
 
-This reproduces a known exact result. The uncertainty is a finite size systematic and not a statistical error. Exact diagonalization stops at L = 20. The free fermion part covers only open chains with h >= 1. I study only ground states. I study only the von Neumann entropy.
+This reproduces a known exact result. The uncertainty is a finite size systematic and not a statistical error. Exact diagonalization stops at L = 20. The free fermion part covers open chains with h >= 1 and periodic chains in the even parity sector. I study only ground states. I study only the von Neumann entropy.
 
 ## Plan written first
 

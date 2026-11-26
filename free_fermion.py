@@ -63,3 +63,16 @@ def entropy_profile_ff(Gamma, L):
         S[l] = block_entropy(Gamma, l)
         S[L - l] = S[l]
     return S
+
+
+def majorana_matrix_periodic(L, h, J=1.0):
+    """Majorana matrix for the periodic chain in the even parity sector.
+
+    In that sector the boundary bond X_{L-1} X_0 maps to an antiperiodic fermion bond,
+    so it enters with the opposite sign to the bulk bonds. Added after the first version
+    (see UPGRADE_PLAN.md). Valid only for the even sector ground state.
+    """
+    A = majorana_matrix(L, h, J)
+    A[2 * L - 1, 0] = -2 * J
+    A[0, 2 * L - 1] = 2 * J
+    return A
